@@ -39,6 +39,35 @@ router.get("/:id", async (req, res) => {
     }
 });
 
+router.put("/:id/follow", async (req, res) => {
+  if(req.body.userId !== req.params.id) {
+    try {
+      const user = await User.findById(req.params.id);
+      const currentUser = await User.findById(req.body.userId);
+      //相手のフォロワーに自分がいない場合にはフォロー可能
+      if(!user.followers.includes(req.body.userId)) {
+        await user.updateOne({
+          $push: {
+            followers: req.body.userId,
+          },
+        });
+        await currentUser.updateOne({
+          $push: {
+            followings: req.params.id,
+          },
+        });
+        return res.status(200).json("フォローに成功しました");
+      } else {
+        return res.status(403).json("フォロー済みアカウントです");
+      }
+    } catch(err) {
+      return res.status(500).json(err);
+    }
+  } else {
+    return res.status(500).json("自信をフォローできません");
+  }
+})
+
 // router.get("/", (req, res) => {
 //   res.send("user Router");
 // });
