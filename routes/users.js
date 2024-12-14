@@ -64,9 +64,38 @@ router.put("/:id/follow", async (req, res) => {
       return res.status(500).json(err);
     }
   } else {
-    return res.status(500).json("自信をフォローできません");
+    return res.status(500).json("自分自身をフォローできません");
   }
-})
+});
+
+router.put("/:id/unfollow", async (req, res) => {
+  if(req.body.userId !== req.params.id) {
+    try {
+      const user = await User.findById(req.params.id);
+      const currentUser = await User.findById(req.body.userId);
+      //自分のフォロワーに相手がいた場合にはフォロー解除可能
+      if(user.followers.includes(req.body.userId)) {
+        await user.updateOne({
+          $pull: {
+            followers: req.body.userId,
+          },
+        });
+        await currentUser.updateOne({
+          $pull: {
+            followings: req.params.id,
+          },
+        });
+        return res.status(200).json("フォロー解除に成功しました");
+      } else {
+        return res.status(403).json("フォローしていないアカウントは解除で来ません");
+      }
+    } catch(err) {
+      return res.status(500).json(err);
+    }
+  } else {
+    return res.status(500).json("自分自身をフォロー解除できません");
+  }
+});
 
 // router.get("/", (req, res) => {
 //   res.send("user Router");
