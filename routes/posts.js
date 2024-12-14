@@ -11,4 +11,20 @@ router.post("/", async(req, res) => {
   }
 });
 
+router.put("/:id", async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.id);
+    if(post.userId === req.body.userId) {
+      await post.updateOne({
+        $set: req.body,
+      });
+      return res.status(200).json("投稿の編集に成功しました");
+    } else {
+      return res.status(403).json("他の人の投稿は編集できません");
+    }
+  } catch(err) {
+    return res.status(403).json(err);
+  }
+});
+
 module.exports = router;
