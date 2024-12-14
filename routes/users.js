@@ -97,8 +97,4 @@ router.put("/:id/unfollow", async (req, res) => {
   }
 });
 
-// router.get("/", (req, res) => {
-//   res.send("user Router");
-// });
-
 module.exports = router;
