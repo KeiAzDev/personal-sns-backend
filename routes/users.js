@@ -29,6 +29,16 @@ router.delete("/:id", async (req, res) => {
   }
 });
 
+router.get("/:id", async (req, res) => {
+    try {
+      const user = await User.findById(req.params.id);
+      const {password, updatedAt, ...other} = user._doc;
+      res.status(200).json(other);
+    } catch(err) {
+      return res.status(500).json(err);
+    }
+});
+
 // router.get("/", (req, res) => {
 //   res.send("user Router");
 // });
